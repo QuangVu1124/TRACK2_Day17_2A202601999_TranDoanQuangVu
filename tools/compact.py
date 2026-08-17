@@ -63,27 +63,34 @@ def main() -> int:
     n_src = len(list(SRC.glob("*.parquet")))
     print(f"  nguồn : {SRC}  ({n_src:,} file)")
 
-    # TODO(nhiệm vụ 4): hiện thực khung COPY ... TO ... ở phần docstring.
-    #
-    #   con.execute(f"""
-    #       copy (
-    #           select * from read_parquet('{SRC}/*.parquet')
-    #           order by ...
-    #       ) to '{DST}' (
-    #           format parquet,
-    #           partition_by (...),
-    #           overwrite_or_ignore,
-    #           row_group_size ...
-    #       )
-    #   """)
-    #
-    # Sau đó kiểm tra không mất hàng nào:
-    #
-    #   assert <số row dataset cũ> == <số row dataset mới>
+    src_pattern = (SRC / "*.parquet").as_posix()
+    dst_path = DST.as_posix()
+    con.execute(f"""
+        copy (
+            select *
+            from read_parquet('{src_pattern}')
+            order by event_date, customer_name, event_time
+        ) to '{dst_path}' (
+            format parquet,
+            partition_by (event_date),
+            overwrite_or_ignore,
+            row_group_size 10000
+        )
+    """)
 
-    print("\n  tools/compact.py chưa được hiện thực — đây là nhiệm vụ 4.")
-    print("  Mở file này, đọc phần KHUNG THỰC HIỆN ở đầu file và điền vào TODO.")
-    print("  Hướng dẫn từng bước: GUIDE.md mục 4.\n")
+    n_old = con.execute(
+        f"select count(*) from read_parquet('{src_pattern}')"
+    ).fetchone()[0]
+    new_pattern = (DST / "**" / "*.parquet").as_posix()
+    n_new = con.execute(
+        f"select count(*) from read_parquet('{new_pattern}', hive_partitioning=true)"
+    ).fetchone()[0]
+    assert n_old == n_new, f"mất dữ liệu khi compact: {n_old:,} != {n_new:,}"
+
+    n_dst = len(list(DST.glob("**/*.parquet")))
+    print(f"  đích  : {DST}  ({n_dst:,} file)")
+    print(f"  số hàng giữ nguyên: {n_old:,}\n")
+    con.close()
     return 0
 
 

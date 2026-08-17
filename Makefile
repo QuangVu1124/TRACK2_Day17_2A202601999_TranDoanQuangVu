@@ -1,11 +1,24 @@
-SHELL   := /bin/bash
 VENV    := .venv
-PY      := $(VENV)/bin/python
-PIP     := $(VENV)/bin/pip
-DBT     := $(VENV)/bin/dbt
+
+ifeq ($(OS),Windows_NT)
+PYTHON  := python
+BIN     := $(VENV)/Scripts
+PY      := $(BIN)/python.exe
+PIP     := $(PY) -m pip
+DBT     := $(BIN)/dbt.exe
+else
+SHELL   := /bin/bash
+PYTHON  := python3
+BIN     := $(VENV)/bin
+PY      := $(BIN)/python
+PIP     := $(PY) -m pip
+DBT     := $(BIN)/dbt
+endif
 
 export LAB17_DB := $(CURDIR)/warehouse.duckdb
 export DBT_PROFILES_DIR := $(CURDIR)/dbt
+# Force UTF-8 for Python/dbt file reads on Windows (whose legacy default is cp1252).
+export PYTHONUTF8 := 1
 
 .DEFAULT_GOAL := help
 .PHONY: help setup seed seed-extra pipeline verify quick explain plan dbt-test \
@@ -20,7 +33,7 @@ help:  ## danh sách lệnh
 	@echo ""
 
 setup:  ## venv + thư viện + sinh dữ liệu (chạy một lần)
-	@test -d $(VENV) || python3 -m venv $(VENV)
+	@$(PYTHON) -c "import os, subprocess; os.path.isfile(r'$(PY)') or subprocess.check_call([r'$(PYTHON)', '-m', 'venv', r'$(VENV)'])"
 	@$(PIP) install -q --upgrade pip
 	@$(PIP) install -q -r requirements.txt
 	@$(PY) seed/generate.py
@@ -63,9 +76,19 @@ crash-test:  ## [mở rộng] kịch bản consumer bị giết giữa batch
 	@$(PY) tools/crash_test.py
 
 reset:  ## xoá kho DuckDB (giữ nguyên seed và data/)
+ifeq ($(OS),Windows_NT)
+	@powershell.exe -NoProfile -Command "Remove-Item -Force -ErrorAction SilentlyContinue 'warehouse.duckdb','warehouse.duckdb.wal'; exit 0"
+	@echo "  kho da xoa."
+else
 	@rm -f warehouse.duckdb warehouse.duckdb.wal
 	@echo "  kho đã xoá."
+endif
 
 clean:  ## xoá kho + target dbt + thư mục làm việc của crash-test
+ifeq ($(OS),Windows_NT)
+	@powershell.exe -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue 'warehouse.duckdb','warehouse.duckdb.wal','dbt/target','dbt/logs','data/crash'; exit 0"
+	@echo "  da don."
+else
 	@rm -rf warehouse.duckdb warehouse.duckdb.wal dbt/target dbt/logs data/crash
 	@echo "  đã dọn."
+endif

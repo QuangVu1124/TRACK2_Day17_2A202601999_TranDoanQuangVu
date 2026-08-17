@@ -39,7 +39,7 @@ make verify
   dashboard rows scanned                      ✓ 5,000,000 → 9,324 (536.3×, cần ≥ 10×)
     số file parquet                           ✓ 5,000 → 14
     kết quả truy vấn không đổi                ✓
-  DAG: catchup / max_active_runs              ✗ True / None
+  DAG: catchup / max_active_runs              ✓ False / 1
 
   TỔNG KẾT
   ──────────────────────────────────────────────────────────────────────────

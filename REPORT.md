@@ -1,7 +1,7 @@
 # Báo cáo LAB 17 — Data Pipeline Engineering
 
 **Họ tên:** Trần Đoàn Quang Vũ  
-**Lớp:** AICB-P2T2  
+**Lớp:** Track2_K3(3A)_E403  
 **Ngày:** 17/08/2026
 
 ## 0 · Kết quả `make verify`

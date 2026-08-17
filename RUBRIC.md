@@ -125,13 +125,13 @@ Hai bài trong [EXTRA.md](EXTRA.md), cần chạy `make seed-extra` trước:
 
 | | Của tôi | Kỳ vọng | ✓/✗ |
 |---|---|---|---|
-| `gold_training_set` — số hàng | | 12.480 | |
-| `gold_training_set` — ổn định 3 lượt | | ✓ | |
-| `gold_feature_daily` — số hàng | | 9.100 | |
-| `gold_feature_daily` — ổn định 3 lượt | | ✓ | |
-| `gold_doc_chunks` — số hàng | | 31.200 | |
-| `quarantine_tickets` — số hàng | | 312 | |
-| `silver_tickets` — số ticket | | 12.480 | |
-| `dbt test` | | pass, > 9 test | |
-| P99 độ trễ đo được | | (ghi số) | |
-| **Tổng verify** | | 4/4 tiêu chí | |
+| `gold_training_set` — số hàng | 12.480 | 12.480 | ✓ |
+| `gold_training_set` — ổn định 3 lượt | ✓ | ✓ | ✓ |
+| `gold_feature_daily` — số hàng | 9.100 | 9.100 | ✓ |
+| `gold_feature_daily` — ổn định 3 lượt | ✓ | ✓ | ✓ |
+| `gold_doc_chunks` — số hàng | 31.200 | 31.200 | ✓ |
+| `quarantine_tickets` — số hàng | 312 | 312 | ✓ |
+| `silver_tickets` — số ticket | 12.480 | 12.480 | ✓ |
+| `dbt test` | 11/11 pass | pass, > 9 test | ✓ |
+| P99 độ trễ đo được | 2,724 ngày | (ghi số) | ✓ |
+| **Tổng verify** | **4/4 tiêu chí** | 4/4 tiêu chí | ✓ |
